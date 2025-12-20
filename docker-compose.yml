@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: quiz-postgres
+    environment:
+      POSTGRES_USER: quiz_user
+      POSTGRES_PASSWORD: quiz_password
+      POSTGRES_DB: quiz_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quiz_user -d quiz_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz-app
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://quiz_user:quiz_password@postgres:5432/quiz_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./apps:/app/apps
+      - /app/node_modules
+
+volumes:
+  postgres_data:

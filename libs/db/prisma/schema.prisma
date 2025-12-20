@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+model Question {
+  id                      String          @id @default(uuid())
+
+  // Core question fields
+  questionText            String          @map("question_text") @db.Text
+  options                 Json            @default("[]") // Array of answer options
+  correctOption           String          @map("correct_option") @db.VarChar(1)
+  topic                   String          @db.VarChar(200)
+  targetDifficultyLabel   DifficultyLevel @map("target_difficulty_label")
+
+  // Scores metadata (nested JSON structure)
+  // Contains: AK, CL, OD, TS, difficulty_score, difficulty_label
+  scores                  Json            @default("{}")
+
+  // Judge feedback metadata (nested JSON structure)
+  // Contains: is_valid, reasons, style_violations, topic_mismatch
+  judgeFeedback           Json            @default("{}") @map("judge_feedback")
+
+  // Timestamps
+  createdAt               DateTime        @default(now()) @map("created_at")
+  updatedAt               DateTime        @updatedAt @map("updated_at")
+
+  @@map("questions")
+  @@index([topic])
+  @@index([targetDifficultyLabel])
+  @@index([createdAt])
+}

@@ -1,0 +1,35 @@
+{
+  "name": "quiz-question-generator",
+  "version": "1.0.0",
+  "description": "TypeScript-based quiz question generator",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch apps/cli/generate_questions.ts",
+    "start": "node dist/apps/cli/generate_questions.js",
+    "lint": "eslint . --ext .ts",
+    "type-check": "tsc --noEmit",
+    "db:generate": "prisma generate --schema=libs/db/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=libs/db/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=libs/db/prisma/schema.prisma",
+    "db:migrate:deploy": "prisma migrate deploy --schema=libs/db/prisma/schema.prisma",
+    "db:studio": "prisma studio --schema=libs/db/prisma/schema.prisma",
+    "db:seed": "tsx libs/db/prisma/seed.ts"
+  },
+  "keywords": [
+    "quiz",
+    "questions",
+    "generator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "prisma": "^7.2.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.2.0"
+  }
+}
