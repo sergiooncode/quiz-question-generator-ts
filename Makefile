@@ -27,13 +27,3 @@ logs-postgres:
 # Open interactive PostgreSQL CLI
 db-shell:
 	docker compose exec postgres psql -U quiz_user -d quiz_db
-
-
-
-
-
-
-
-
-
-
