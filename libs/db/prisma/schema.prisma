@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  output   = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -18,7 +18,8 @@ enum DifficultyLevel {
 }
 
 model Question {
-  id                      String          @id @default(uuid())
+  id                      Int             @id @default(autoincrement())
+  uuid                    String          @unique @default(uuid())
 
   // Core question fields
   questionText            String          @map("question_text") @db.Text
@@ -27,20 +28,55 @@ model Question {
   topic                   String          @db.VarChar(200)
   targetDifficultyLabel   DifficultyLevel @map("target_difficulty_label")
 
-  // Scores metadata (nested JSON structure)
-  // Contains: AK, CL, OD, TS, difficulty_score, difficulty_label
-  scores                  Json            @default("{}")
-
-  // Judge feedback metadata (nested JSON structure)
-  // Contains: is_valid, reasons, style_violations, topic_mismatch
-  judgeFeedback           Json            @default("{}") @map("judge_feedback")
-
   // Timestamps
   createdAt               DateTime        @default(now()) @map("created_at")
   updatedAt               DateTime        @updatedAt @map("updated_at")
 
+  // Relations
+  reviews                 QuestionReview[]
+
   @@map("questions")
+  @@index([uuid])
   @@index([topic])
   @@index([targetDifficultyLabel])
   @@index([createdAt])
+}
+
+model QuestionReview {
+  id                      Int             @id @default(autoincrement())
+  uuid                    String          @unique @default(uuid())
+
+  // Relation to Question
+  questionId              Int             @map("question_id")
+  question                Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  // Rubric scores (1-4)
+  ak                      Int             @db.SmallInt  // Accessibility of Knowledge
+  cl                      Int             @db.SmallInt  // Cognitive Load
+  od                      Int             @db.SmallInt  // Obscurity of Distractors
+  ts                      Int             @db.SmallInt  // Topic Specialization
+
+  // Difficulty assessment
+  difficultyScore         Float           @map("difficulty_score")
+  difficultyLabel         DifficultyLevel @map("difficulty_label")
+
+  // Validation flags
+  isValid                 Boolean         @default(true) @map("is_valid")
+  topicMismatch           Boolean         @default(false) @map("topic_mismatch")
+
+  // Feedback arrays
+  styleViolations         Json            @default("[]") @map("style_violations")
+  factualConcerns         Json            @default("[]") @map("factual_concerns")
+
+  // Raw judge output for debugging
+  rawJudgeOutput          Json?           @map("raw_judge_output")
+
+  // Timestamps
+  createdAt               DateTime        @default(now()) @map("created_at")
+
+  @@map("question_reviews")
+  @@index([uuid])
+  @@index([questionId])
+  @@index([difficultyLabel])
+  @@index([isValid])
 }
