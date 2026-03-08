@@ -265,7 +265,7 @@ async function reviewQuestion(
         od: result.scores.OD,
         ts: result.scores.TS,
         difficultyScore: result.difficulty_score,
-        difficultyLabel: result.difficulty_label as DifficultyLabel,
+        difficultyLabel: result.difficulty_label as DifficultyLevel,
         isValid: result.feedback.is_valid,
         topicMismatch: result.feedback.topic_mismatch,
         styleViolations: result.feedback.style_violations,
