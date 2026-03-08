@@ -1,4 +1,4 @@
-.PHONY: up up-build down logs logs-app logs-postgres db-shell quiz
+.PHONY: up up-build down logs logs-app logs-postgres db-shell quiz db-generate db-migrate db-migrate-deploy db-push db-studio db-seed
 
 # Start Docker containers (detached)
 up:
@@ -30,7 +30,24 @@ db-shell:
 
 # Run quiz-generator CLI in Docker (pass command and options via ARGS)
 # Example: make quiz ARGS="generate-question --count 5 --save-to-db --judge"
-# Example: make quiz ARGS="review-question --all"
-# Example: make quiz ARGS="list --topic Capitals"
 quiz:
 	docker compose run --rm app node dist/apps/cli/quiz.js $(ARGS)
+
+# Prisma commands (Docker) - ensure postgres is running: make up
+db-generate:
+	docker compose --profile tools run --rm prisma npm run db:generate
+
+db-migrate:
+	docker compose --profile tools run --rm prisma npm run db:migrate
+
+db-migrate-deploy:
+	docker compose --profile tools run --rm prisma npm run db:migrate:deploy
+
+db-push:
+	docker compose --profile tools run --rm prisma npm run db:push
+
+db-studio:
+	docker compose --profile tools run --rm -p 5555:5555 prisma npx prisma studio --schema=libs/db/prisma/schema.prisma --browser none --port 5555
+
+db-seed:
+	docker compose --profile tools run --rm prisma npm run db:seed

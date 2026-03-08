@@ -103,28 +103,36 @@ make db-shell
 
 ## Running Prisma in Docker
 
-To run migrations against the Dockerized database from your host:
-
-1. Start Postgres: `make up` or `docker compose up -d postgres`
-2. Use the local connection string: `postgresql://quiz_user:quiz_password@localhost:5432/quiz_db`
-3. Run commands locally: `npm run db:migrate`, `npm run db:push`, etc.
-
-To run migrations from inside a container (e.g. app container):
+Start Postgres first, then run Prisma commands in Docker:
 
 ```bash
-docker compose run --rm app npx prisma migrate deploy --schema=libs/db/prisma/schema.prisma
+make up
+make db-migrate          # Create and apply migration
+make db-migrate-deploy   # Apply migrations (production)
+make db-push             # Push schema (prototype)
+make db-generate         # Regenerate Prisma client
+make db-studio           # Open Prisma Studio at http://localhost:5555
+make db-seed             # Run seed script
 ```
+
+The `prisma` service uses the builder image (includes Prisma CLI) and connects to the `postgres` container. Migration files are written to `libs/db/prisma/migrations/` via a volume mount.
+
+**Running locally (against Docker Postgres):**
+
+1. Start Postgres: `make up`
+2. Set `DATABASE_URL=postgresql://quiz_user:quiz_password@localhost:5432/quiz_db` in `.env`
+3. Run: `npm run db:migrate`, `npm run db:push`, etc.
 
 ---
 
 ## Quick Reference
 
-| Command            | Script                 | Description                        |
-|--------------------|------------------------|------------------------------------|
-| Generate client    | `npm run db:generate`  | Regenerate Prisma client           |
-| Create migration   | `npm run db:migrate`   | Create and apply migration (dev)   |
-| Deploy migrations  | `npm run db:migrate:deploy` | Apply migrations (prod)      |
-| Push schema        | `npm run db:push`      | Sync schema without migrations     |
-| Prisma Studio      | `npm run db:studio`    | GUI for database                   |
-| Seed               | `npm run db:seed`      | Run seed script                    |
-| DB shell           | `make db-shell`        | Interactive psql                   |
+| Command            | Local                    | Docker (Make)      |
+|--------------------|--------------------------|--------------------|
+| Generate client    | `npm run db:generate`    | `make db-generate` |
+| Create migration   | `npm run db:migrate`     | `make db-migrate`  |
+| Deploy migrations  | `npm run db:migrate:deploy` | `make db-migrate-deploy` |
+| Push schema        | `npm run db:push`        | `make db-push`     |
+| Prisma Studio      | `npm run db:studio`      | `make db-studio`   |
+| Seed               | `npm run db:seed`        | `make db-seed`     |
+| DB shell           | `make db-shell`          | `make db-shell`    |

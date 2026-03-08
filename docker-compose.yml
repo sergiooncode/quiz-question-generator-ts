@@ -16,6 +16,22 @@ services:
       timeout: 5s
       retries: 5
 
+  # Prisma CLI service (uses builder stage with full deps for migrations, etc.)
+  prisma:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    environment:
+      DATABASE_URL: postgresql://quiz_user:quiz_password@postgres:5432/quiz_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./libs/db/prisma:/app/libs/db/prisma
+    profiles:
+      - tools
+
   app:
     build:
       context: .
