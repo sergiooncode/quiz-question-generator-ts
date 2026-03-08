@@ -16,7 +16,7 @@
     "db:migrate:deploy": "prisma migrate deploy --schema=libs/db/prisma/schema.prisma",
     "db:studio": "prisma studio --schema=libs/db/prisma/schema.prisma",
     "db:seed": "tsx libs/db/prisma/seed.ts",
-    "db:shell": "docker-compose exec postgres psql -U quiz_user -d quiz_db"
+    "db:shell": "docker compose exec postgres psql -U quiz_user -d quiz_db"
   },
   "keywords": [
     "quiz",
