@@ -19,9 +19,14 @@ npm run quiz -- <command> [options]
 npm start -- <command> [options]
 ```
 
-**Docker:**
+**Docker (using Make):**
 ```bash
-docker compose exec app node dist/apps/cli/quiz.js <command> [options]
+make quiz ARGS="<command> [options]"
+```
+
+**Docker (direct):**
+```bash
+docker compose run --rm app node dist/apps/cli/quiz.js <command> [options]
 ```
 
 > **Note:** Use `--` before flags to pass them to the script (e.g. `npm run quiz -- generate-question --count 5`).
@@ -44,20 +49,15 @@ Generate geography quiz questions using GPT-4o-mini.
 **Examples:**
 
 ```bash
-# Generate 5 questions (output only, no DB)
+# Local
 npm run quiz -- generate-question --count 5
-
-# Generate 10 questions and save to database
 npm run quiz -- generate-question --save-to-db
-
-# Generate 3 ADVANCED questions, save and judge
 npm run quiz -- generate-question --count 3 --save-to-db --judge --target-difficulty ADVANCED
 
-# Generate 20 BEGINNER questions and save
-npm run quiz -- generate-question --count 20 --save-to-db --target-difficulty BEGINNER
-
-# Full example with all options
-npm run quiz -- generate-question --count 15 --save-to-db --judge --target-difficulty INTERMEDIATE
+# Docker
+make quiz ARGS="generate-question --count 5"
+make quiz ARGS="generate-question --count 10 --save-to-db --judge"
+make quiz ARGS="generate-question --count 3 --save-to-db --target-difficulty BEGINNER"
 ```
 
 ---
@@ -75,14 +75,14 @@ Judge and score existing questions for difficulty and quality.
 **Examples:**
 
 ```bash
-# Review all unreviewed questions
+# Local
 npm run quiz -- review-question --all
-
-# Review first 10 unreviewed questions
 npm run quiz -- review-question --count 10
 
-# Review a specific question by ID
-npm run quiz -- review-question --question-id 550e8400-e29b-41d4-a716-446655440000
+# Docker
+make quiz ARGS="review-question --all"
+make quiz ARGS="review-question --count 10"
+make quiz ARGS="review-question --question-id 550e8400-e29b-41d4-a716-446655440000"
 ```
 
 ---
@@ -98,11 +98,13 @@ List existing questions from the database.
 **Examples:**
 
 ```bash
-# List all questions
+# Local
 npm run quiz -- list
-
-# List questions filtered by topic
 npm run quiz -- list --topic "Capitals"
+
+# Docker
+make quiz ARGS="list"
+make quiz ARGS="list --topic Capitals"
 ```
 
 ---

@@ -1,4 +1,4 @@
-.PHONY: up up-build down logs logs-app logs-postgres db-shell
+.PHONY: up up-build down logs logs-app logs-postgres db-shell quiz
 
 # Start Docker containers (detached)
 up:
@@ -27,3 +27,10 @@ logs-postgres:
 # Open interactive PostgreSQL CLI
 db-shell:
 	docker compose exec postgres psql -U quiz_user -d quiz_db
+
+# Run quiz-generator CLI in Docker (pass command and options via ARGS)
+# Example: make quiz ARGS="generate-question --count 5 --save-to-db --judge"
+# Example: make quiz ARGS="review-question --all"
+# Example: make quiz ARGS="list --topic Capitals"
+quiz:
+	docker compose run --rm app node dist/apps/cli/quiz.js $(ARGS)
