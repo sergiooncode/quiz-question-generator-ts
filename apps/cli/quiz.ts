@@ -1,7 +1,41 @@
 import 'dotenv/config';
 import { Command, Option } from 'commander';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { prisma, DifficultyLevel } from '../../libs/db/src';
 import { generate_question, judgeQuestion, GeneratedQuestion } from '../../libs/llm/src';
+
+/** Escape a value for CSV (wrap in quotes if needed, escape inner quotes) */
+function escapeCsv(value: string): string {
+  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+/** Parse a single CSV line (handles quoted fields with commas and escaped quotes) */
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (c === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += c;
+    }
+  }
+  result.push(current);
+  return result;
+}
 
 const program = new Command();
 
@@ -229,6 +263,184 @@ program
   .option('-t, --topic <topic>', 'Filter by topic')
   .action(async (options) => {
     // List questions logic
+  });
+
+program
+  .command('export-csv')
+  .description('Export quiz questions from the database to a CSV file')
+  .option('-o, --output <path>', 'Output file path', 'questions.csv')
+  .option('-t, --topic <topic>', 'Filter by topic')
+  .option(
+    '--target-difficulty <level>',
+    'Filter by target difficulty (BEGINNER, INTERMEDIATE, ADVANCED, EXPERT)'
+  )
+  .action(async (options) => {
+    try {
+      const where: { topic?: string; targetDifficultyLabel?: DifficultyLevel } = {};
+      if (options.topic) where.topic = options.topic;
+      if (options.targetDifficulty) where.targetDifficultyLabel = options.targetDifficulty as DifficultyLevel;
+
+      const questions = await prisma.question.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          reviews: {
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+          },
+        },
+      });
+
+      const headers = [
+        'id',
+        'uuid',
+        'question_text',
+        'options',
+        'correct_option',
+        'topic',
+        'target_difficulty',
+        'difficulty_score',
+        'difficulty_label',
+        'is_valid',
+        'created_at',
+      ];
+
+      const rows = questions.map((q) => {
+        const options = Array.isArray(q.options) ? q.options : JSON.parse(String(q.options || '[]'));
+        const latestReview = q.reviews[0];
+        return [
+          q.id,
+          q.uuid,
+          q.questionText,
+          options.join(' | '),
+          q.correctOption,
+          q.topic,
+          q.targetDifficultyLabel,
+          latestReview?.difficultyScore ?? '',
+          latestReview?.difficultyLabel ?? '',
+          latestReview?.isValid ?? '',
+          q.createdAt.toISOString(),
+        ].map(String).map(escapeCsv);
+      });
+
+      const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+      writeFileSync(options.output, csv, 'utf-8');
+
+      console.log(`\x1b[32mExported ${questions.length} questions to ${options.output}\x1b[0m`);
+    } catch (error) {
+      console.error(
+        `\x1b[31mError: ${error instanceof Error ? error.message : String(error)}\x1b[0m`
+      );
+      process.exit(1);
+    } finally {
+      await prisma.$disconnect();
+    }
+  });
+
+program
+  .command('import-csv')
+  .description('Import quiz questions from a CSV file into the database')
+  .option('-i, --input <path>', 'Input CSV file path', 'questions.csv')
+  .option('--no-skip-header', 'First row is data (no header row)')
+  .action(async (options) => {
+    try {
+      if (!existsSync(options.input)) {
+        console.error(`\x1b[31mError: File not found: ${options.input}\x1b[0m`);
+        process.exit(1);
+      }
+
+      const content = readFileSync(options.input, 'utf-8');
+      const lines = content.split(/\r?\n/).filter((l) => l.trim());
+
+      if (lines.length === 0) {
+        console.error(`\x1b[31mError: CSV file is empty\x1b[0m`);
+        process.exit(1);
+      }
+
+      const rows = lines.map(parseCsvLine);
+      const headerRow = rows[0];
+      const skipHeader = options.skipHeader !== false;
+      const dataRows = skipHeader ? rows.slice(1) : rows;
+
+      // Find column indices (support both export format and minimal format)
+      const col = (name: string) => {
+        const idx = headerRow.findIndex((h) => h.toLowerCase().replace(/[- ]/g, '_') === name.toLowerCase().replace(/[- ]/g, '_'));
+        return idx >= 0 ? idx : -1;
+      };
+
+      const questionTextIdx = col('question_text') >= 0 ? col('question_text') : col('question');
+      const optionsIdx = col('options');
+      const correctOptionIdx = col('correct_option') >= 0 ? col('correct_option') : col('correct');
+      const topicIdx = col('topic');
+      const targetDifficultyIdx = col('target_difficulty') >= 0 ? col('target_difficulty') : col('target_difficulty_label');
+
+      if (questionTextIdx < 0 || optionsIdx < 0 || correctOptionIdx < 0 || topicIdx < 0) {
+        console.error(
+          '\x1b[31mError: CSV must have columns: question_text, options, correct_option, topic. Optional: target_difficulty\x1b[0m'
+        );
+        console.error(`Found headers: ${headerRow.join(', ')}`);
+        process.exit(1);
+      }
+
+      const validDifficulties: DifficultyLevel[] = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'];
+      let imported = 0;
+      let skipped = 0;
+
+      for (let i = 0; i < dataRows.length; i++) {
+        const row = dataRows[i];
+        const questionText = (row[questionTextIdx] ?? '').trim();
+        const optionsStr = (row[optionsIdx] ?? '').trim();
+        const correctOption = (row[correctOptionIdx] ?? '').trim().toLowerCase().charAt(0);
+        const topic = (row[topicIdx] ?? '').trim();
+        const targetDifficulty =
+          targetDifficultyIdx >= 0 && row[targetDifficultyIdx]
+            ? (row[targetDifficultyIdx].trim().toUpperCase() as DifficultyLevel)
+            : 'INTERMEDIATE';
+
+        if (!questionText || !topic) {
+          skipped++;
+          continue;
+        }
+
+        if (!validDifficulties.includes(targetDifficulty)) {
+          skipped++;
+          continue;
+        }
+
+        const options = optionsStr ? optionsStr.split(/\s*\|\s*/).map((o) => o.trim()).filter(Boolean) : [];
+        if (options.length === 0) {
+          skipped++;
+          continue;
+        }
+
+        const correctIdx = 'abcd'.indexOf(correctOption);
+        if (correctIdx < 0 || correctIdx >= options.length) {
+          skipped++;
+          continue;
+        }
+
+        await prisma.question.create({
+          data: {
+            questionText,
+            options,
+            correctOption,
+            topic: topic.slice(0, 200),
+            targetDifficultyLabel: targetDifficulty,
+          },
+        });
+        imported++;
+        console.log(`\x1b[32m[${imported}] Imported: ${questionText.slice(0, 50)}...\x1b[0m`);
+      }
+
+      console.log(`\x1b[32mImported ${imported} questions. Skipped ${skipped} rows.\x1b[0m`);
+    } catch (error) {
+      console.error(
+        `\x1b[31mError: ${error instanceof Error ? error.message : String(error)}\x1b[0m`
+      );
+      process.exit(1);
+    } finally {
+      await prisma.$disconnect();
+    }
   });
 
 program.parse();

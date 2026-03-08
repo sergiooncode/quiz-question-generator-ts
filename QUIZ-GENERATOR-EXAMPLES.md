@@ -109,6 +109,56 @@ make quiz ARGS="list --topic Capitals"
 
 ---
 
+### 4. Export to CSV (`export-csv`)
+
+Export quiz questions from the database to a CSV file.
+
+| Option | Description |
+|--------|-------------|
+| `-o, --output <path>` | Output file path (default: questions.csv) |
+| `-t, --topic <topic>` | Filter by topic |
+| `--target-difficulty <level>` | Filter by target difficulty |
+
+**Examples:**
+
+```bash
+# Local
+npm run quiz -- export-csv
+npm run quiz -- export-csv -o my-questions.csv
+npm run quiz -- export-csv --topic "Capitals" -o capitals.csv
+
+# Docker (use -o /app/apps/<file>.csv to write to host via mounted volume)
+make quiz ARGS="export-csv -o /app/apps/questions.csv"
+make quiz ARGS="export-csv --topic Capitals -o /app/apps/capitals.csv"
+make quiz ARGS="export-csv --target-difficulty ADVANCED -o /app/apps/advanced.csv"
+```
+
+---
+
+### 5. Import from CSV (`import-csv`)
+
+Import quiz questions from a CSV file into the database.
+
+| Option | Description |
+|--------|-------------|
+| `-i, --input <path>` | Input CSV file path (default: questions.csv) |
+| `--no-skip-header` | First row is data (no header) |
+
+**CSV format:** Must have columns: `question_text`, `options` (pipe-separated), `correct_option` (a/b/c/d), `topic`. Optional: `target_difficulty` (BEGINNER, INTERMEDIATE, ADVANCED, EXPERT).
+
+**Examples:**
+
+```bash
+# Local
+npm run quiz -- import-csv
+npm run quiz -- import-csv -i my-questions.csv
+
+# Docker (use -i /app/apps/<file>.csv for file on host)
+make quiz ARGS="import-csv -i /app/apps/questions.csv"
+```
+
+---
+
 ## Help
 
 Get help for any command:
