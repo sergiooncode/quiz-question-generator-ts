@@ -27,6 +27,8 @@ model Question {
   correctOption           String          @map("correct_option") @db.VarChar(1)
   topic                   String          @db.VarChar(200)
   targetDifficultyLabel   DifficultyLevel @map("target_difficulty_label")
+  answerExplanation       String?         @map("answer_explanation") @db.Text
+  answerSources           Json            @default("[]") @map("answer_sources")
 
   // Timestamps
   createdAt               DateTime        @default(now()) @map("created_at")

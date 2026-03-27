@@ -13,5 +13,7 @@ export interface Question {
   correctOption: string
   topic: string
   targetDifficultyLabel: string
+  answerExplanation: string | null
+  answerSources: string[]
   reviews: Review[]
 }

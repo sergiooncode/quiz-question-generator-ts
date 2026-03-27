@@ -111,6 +111,8 @@ program
               correctOption: q.correct_option,
               topic: q.topic,
               targetDifficultyLabel: targetDifficulty as DifficultyLevel,
+              answerExplanation: q.answer_explanation,
+              answerSources: q.answer_sources,
             },
           });
           dbQuestions.push(questionObj);

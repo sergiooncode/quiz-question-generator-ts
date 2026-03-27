@@ -49,7 +49,7 @@ export async function generate_question(
         content: prompt,
       },
     ],
-    maxTokens: 300,
+    maxTokens: 600,
     responseFormat: { type: 'json_object' },
   });
 

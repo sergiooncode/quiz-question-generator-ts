@@ -93,7 +93,9 @@ Return ONLY JSON, no explanations.
   "question": "<text>",
   "options": ["a) ...", "b) ...", "c) ...", "d) ..."],
   "correct_option": "a" | "b" | "c" | "d",
-  "topic": "<category>"
+  "topic": "<category>",
+  "answer_explanation": "<concise explanation of why the correct answer is correct and why the other options are wrong>",
+  "answer_sources": ["<source 1: e.g. Wikipedia article, atlas, official record>", "<source 2>"]
 }}
 
 Generate ONE question at the {target_difficulty} difficulty level.

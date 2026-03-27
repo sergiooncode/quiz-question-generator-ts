@@ -40,6 +40,12 @@ async function runReview() {
         &middot; {{ review.isValid ? 'Valid' : 'Invalid' }}
       </template>
     </div>
+    <div v-if="question.answerExplanation" class="explanation">
+      <strong>Explanation:</strong> {{ question.answerExplanation }}
+    </div>
+    <ul v-if="question.answerSources?.length" class="sources">
+      <li v-for="(source, i) in question.answerSources" :key="i">{{ source }}</li>
+    </ul>
     <button v-if="!review" @click="runReview" :disabled="reviewing" style="margin-top: 8px">
       {{ reviewing ? 'Reviewing...' : 'Review' }}
     </button>
