@@ -28,7 +28,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./libs/db/prisma:/app/libs/db/prisma
+      - ./backend/libs/db/prisma:/app/backend/libs/db/prisma
     profiles:
       - tools
 
@@ -50,8 +50,38 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./apps:/app/apps
+      - ./backend:/app/backend
       - /app/node_modules
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz-api
+    command: ["node", "dist/backend/apps/api/src/main.js"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://quiz_user:quiz_password@postgres:5432/quiz_db
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: quiz-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
 
   # Zookeeper - required for Kafka
   # zookeeper:

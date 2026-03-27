@@ -1,0 +1,88 @@
+:root {
+  --bg: #fff;
+  --text: #1a1a1a;
+  --muted: #666;
+  --border: #e0e0e0;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111;
+    --text: #e5e5e5;
+    --muted: #999;
+    --border: #333;
+    --accent: #818cf8;
+    --accent-hover: #6366f1;
+    --success: #22c55e;
+    --danger: #f87171;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+h1 { font-size: 24px; margin-bottom: 24px; }
+h2 { font-size: 18px; margin-bottom: 12px; }
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+button:hover { background: var(--accent-hover); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.card h3 { font-size: 15px; margin-bottom: 8px; }
+
+.options { list-style: none; padding: 0; }
+.options li { padding: 4px 0; font-size: 14px; }
+.options li.correct { color: var(--success); font-weight: 600; }
+
+.meta { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.empty { color: var(--muted); font-size: 14px; padding: 32px 0; text-align: center; }
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+}

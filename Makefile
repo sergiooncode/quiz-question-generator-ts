@@ -1,4 +1,4 @@
-.PHONY: up up-build down logs logs-app logs-postgres db-shell quiz db-generate db-migrate db-migrate-deploy db-push db-studio db-seed
+.PHONY: up up-build down logs logs-app logs-api logs-postgres db-shell quiz db-generate db-migrate db-migrate-deploy db-push db-studio db-seed
 
 # Start Docker containers (detached)
 up:
@@ -19,6 +19,10 @@ logs:
 # Tail logs from app container
 logs-app:
 	docker compose logs -f app
+
+# Tail logs from api container
+logs-api:
+	docker compose logs -f api
 
 # Tail logs from postgres container
 logs-postgres:
@@ -47,7 +51,7 @@ db-push:
 	docker compose --profile tools run --rm prisma npm run db:push
 
 db-studio:
-	docker compose --profile tools run --rm -p 5555:5555 prisma npx prisma studio --schema=libs/db/prisma/schema.prisma --browser none --port 5555
+	docker compose --profile tools run --rm -p 5555:5555 prisma npx prisma studio --schema=backend/libs/db/prisma/schema.prisma --browser none --port 5555
 
 db-seed:
 	docker compose --profile tools run --rm prisma npm run db:seed

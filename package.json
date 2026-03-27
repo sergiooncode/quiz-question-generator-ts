@@ -5,17 +5,19 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch apps/cli/src/quiz.ts",
-    "quiz": "tsx apps/cli/src/quiz.ts",
-    "start": "node dist/apps/cli/src/quiz.js",
+    "dev": "tsx watch backend/apps/cli/src/quiz.ts",
+    "dev:api": "tsx watch backend/apps/api/src/main.ts",
+    "start:api": "node dist/backend/apps/api/src/main.js",
+    "quiz": "tsx backend/apps/cli/src/quiz.ts",
+    "start": "node dist/backend/apps/cli/src/quiz.js",
     "lint": "eslint . --ext .ts",
     "type-check": "tsc --noEmit",
-    "db:generate": "prisma generate --schema=libs/db/prisma/schema.prisma",
-    "db:push": "prisma db push --schema=libs/db/prisma/schema.prisma",
-    "db:migrate": "prisma migrate dev --schema=libs/db/prisma/schema.prisma",
-    "db:migrate:deploy": "prisma migrate deploy --schema=libs/db/prisma/schema.prisma",
-    "db:studio": "prisma studio --schema=libs/db/prisma/schema.prisma",
-    "db:seed": "tsx libs/db/prisma/seed.ts",
+    "db:generate": "prisma generate --schema=backend/libs/db/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=backend/libs/db/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=backend/libs/db/prisma/schema.prisma",
+    "db:migrate:deploy": "prisma migrate deploy --schema=backend/libs/db/prisma/schema.prisma",
+    "db:studio": "prisma studio --schema=backend/libs/db/prisma/schema.prisma",
+    "db:seed": "tsx backend/libs/db/prisma/seed.ts",
     "db:shell": "docker compose exec postgres psql -U quiz_user -d quiz_db"
   },
   "keywords": [
@@ -26,6 +28,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/koa": "^3.0.2",
+    "@types/koa__router": "^12.0.5",
+    "@types/koa-bodyparser": "^4.3.13",
     "@types/node": "^20.10.0",
     "@types/pg": "^8.16.0",
     "prisma": "^7.2.0",
@@ -33,10 +38,13 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@koa/router": "^15.4.0",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "commander": "^14.0.2",
     "dotenv": "^16.0.0",
+    "koa": "^3.1.2",
+    "koa-bodyparser": "^4.4.1",
     "openai": "^4.0.0",
     "pg": "^8.16.3",
     "zod": "^3.22.0"
