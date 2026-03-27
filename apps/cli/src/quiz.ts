@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import { Command, Option } from 'commander';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { prisma, DifficultyLevel } from '../../libs/db/src';
-import { generate_question, judgeQuestion, GeneratedQuestion } from '../../libs/llm/src';
+import { prisma, DifficultyLevel } from '../../../libs/db/src';
+import { generate_question, judgeQuestion, GeneratedQuestion } from '../../../libs/llm/src';
 
 /** Escape a value for CSV (wrap in quotes if needed, escape inner quotes) */
 function escapeCsv(value: string): string {

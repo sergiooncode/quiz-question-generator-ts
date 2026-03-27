@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch apps/cli/quiz.ts",
-    "quiz": "tsx apps/cli/quiz.ts",
-    "start": "node dist/apps/cli/quiz.js",
+    "dev": "tsx watch apps/cli/src/quiz.ts",
+    "quiz": "tsx apps/cli/src/quiz.ts",
+    "start": "node dist/apps/cli/src/quiz.js",
     "lint": "eslint . --ext .ts",
     "type-check": "tsc --noEmit",
     "db:generate": "prisma generate --schema=libs/db/prisma/schema.prisma",

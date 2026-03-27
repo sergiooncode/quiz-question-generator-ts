@@ -31,7 +31,7 @@ db-shell:
 # Run quiz-generator CLI in Docker (pass command and options via ARGS)
 # Example: make quiz ARGS="generate-question --count 5 --save-to-db --judge"
 quiz:
-	docker compose run --rm app node dist/apps/cli/quiz.js $(ARGS)
+	docker compose run --rm app npm start -- $(ARGS)
 
 # Prisma commands (Docker) - ensure postgres is running: make up
 db-generate:

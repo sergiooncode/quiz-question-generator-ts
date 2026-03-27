@@ -5,26 +5,31 @@ This document provides examples for running the quiz-generator CLI.
 ## Running the CLI
 
 **Development (with hot reload):**
+
 ```bash
 npm run dev -- <command> [options]
 ```
 
 **Development (one-off run):**
+
 ```bash
 npm run quiz -- <command> [options]
 ```
 
 **Production (after build):**
+
 ```bash
 npm start -- <command> [options]
 ```
 
 **Docker (using Make):**
+
 ```bash
 make quiz ARGS="<command> [options]"
 ```
 
 **Docker (direct):**
+
 ```bash
 docker compose run --rm app node dist/apps/cli/quiz.js <command> [options]
 ```
@@ -39,12 +44,14 @@ docker compose run --rm app node dist/apps/cli/quiz.js <command> [options]
 
 Generate geography quiz questions using GPT-4o-mini.
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--count <number>` | Number of questions to generate | 10 |
-| `--save-to-db` | Save questions to the database | false |
-| `--judge` | Judge questions after generation (requires `--save-to-db`) | false |
-| `--target-difficulty <level>` | Difficulty: BEGINNER, INTERMEDIATE, ADVANCED, EXPERT | EXPERT |
+
+| Option                        | Description                                                | Default |
+| ----------------------------- | ---------------------------------------------------------- | ------- |
+| `--count <number>`            | Number of questions to generate                            | 10      |
+| `--save-to-db`                | Save questions to the database                             | false   |
+| `--judge`                     | Judge questions after generation (requires `--save-to-db`) | false   |
+| `--target-difficulty <level>` | Difficulty: BEGINNER, INTERMEDIATE, ADVANCED, EXPERT       | EXPERT  |
+
 
 **Examples:**
 
@@ -57,7 +64,7 @@ npm run quiz -- generate-question --count 3 --save-to-db --judge --target-diffic
 # Docker
 make quiz ARGS="generate-question --count 5"
 make quiz ARGS="generate-question --count 10 --save-to-db --judge"
-make quiz ARGS="generate-question --count 3 --save-to-db --target-difficulty BEGINNER"
+
 ```
 
 ---
@@ -66,11 +73,13 @@ make quiz ARGS="generate-question --count 3 --save-to-db --target-difficulty BEG
 
 Judge and score existing questions for difficulty and quality.
 
-| Option | Description |
-|--------|-------------|
-| `--all` | Review all unreviewed questions |
-| `--question-id <uuid>` | Review a specific question by ID |
-| `--count <number>` | Review the first N unreviewed questions |
+
+| Option                 | Description                             |
+| ---------------------- | --------------------------------------- |
+| `--all`                | Review all unreviewed questions         |
+| `--question-id <uuid>` | Review a specific question by ID        |
+| `--count <number>`     | Review the first N unreviewed questions |
+
 
 **Examples:**
 
@@ -91,9 +100,11 @@ make quiz ARGS="review-question --question-id 550e8400-e29b-41d4-a716-4466554400
 
 List existing questions from the database.
 
-| Option | Description |
-|--------|-------------|
+
+| Option                | Description     |
+| --------------------- | --------------- |
 | `-t, --topic <topic>` | Filter by topic |
+
 
 **Examples:**
 
@@ -113,11 +124,13 @@ make quiz ARGS="list --topic Capitals"
 
 Export quiz questions from the database to a CSV file.
 
-| Option | Description |
-|--------|-------------|
-| `-o, --output <path>` | Output file path (default: questions.csv) |
-| `-t, --topic <topic>` | Filter by topic |
-| `--target-difficulty <level>` | Filter by target difficulty |
+
+| Option                        | Description                               |
+| ----------------------------- | ----------------------------------------- |
+| `-o, --output <path>`         | Output file path (default: questions.csv) |
+| `-t, --topic <topic>`         | Filter by topic                           |
+| `--target-difficulty <level>` | Filter by target difficulty               |
+
 
 **Examples:**
 
@@ -139,10 +152,12 @@ make quiz ARGS="export-csv --target-difficulty ADVANCED -o /app/apps/advanced.cs
 
 Import quiz questions from a CSV file into the database.
 
-| Option | Description |
-|--------|-------------|
+
+| Option               | Description                                  |
+| -------------------- | -------------------------------------------- |
 | `-i, --input <path>` | Input CSV file path (default: questions.csv) |
-| `--no-skip-header` | First row is data (no header) |
+| `--no-skip-header`   | First row is data (no header)                |
+
 
 **CSV format:** Must have columns: `question_text`, `options` (pipe-separated), `correct_option` (a/b/c/d), `topic`. Optional: `target_difficulty` (BEGINNER, INTERMEDIATE, ADVANCED, EXPERT).
 
@@ -178,3 +193,4 @@ Ensure these are set (in `.env`, `.env.local`, or your environment):
 
 - `OPENAI_API_KEY` — Required for question generation and judging
 - `DATABASE_URL` — Required for database operations (e.g. `postgresql://quiz_user:quiz_password@localhost:5432/quiz_db`)
+
