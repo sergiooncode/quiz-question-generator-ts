@@ -60,6 +60,10 @@ async function runReview() {
       <ul v-if="review.factualConcerns?.length" class="review-issues">
         <li v-for="(c, i) in review.factualConcerns" :key="i">{{ c }}</li>
       </ul>
+      <details v-if="review.rawJudgeOutput" class="raw-output">
+        <summary>Raw judge output</summary>
+        <pre>{{ JSON.stringify(review.rawJudgeOutput, null, 2) }}</pre>
+      </details>
     </div>
     <div v-if="question.answerExplanation" class="explanation">
       <strong>Explanation:</strong> {{ question.answerExplanation }}

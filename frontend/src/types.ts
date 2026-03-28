@@ -10,6 +10,7 @@ export interface Review {
   topicMismatch: boolean
   styleViolations: string[]
   factualConcerns: string[]
+  rawJudgeOutput: Record<string, unknown> | null
 }
 
 export interface Question {

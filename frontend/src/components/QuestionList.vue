@@ -6,6 +6,9 @@ import type { Question } from '../types'
 const questions = ref<Question[]>([])
 const loading = ref(false)
 const generating = ref(false)
+const batchCount = ref(5)
+const batchDifficulty = ref('EXPERT')
+const difficulties = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT']
 
 async function fetchQuestions() {
   loading.value = true
@@ -18,13 +21,13 @@ async function fetchQuestions() {
   }
 }
 
-async function generate() {
+async function generate(count = 1, difficulty = 'EXPERT') {
   generating.value = true
   try {
     await fetch('/api/questions/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetDifficulty: 'EXPERT', count: 1 }),
+      body: JSON.stringify({ targetDifficulty: difficulty, count }),
     })
     await fetchQuestions()
   } finally {
@@ -37,8 +40,15 @@ onMounted(fetchQuestions)
 
 <template>
   <div class="toolbar">
-    <button @click="generate" :disabled="generating">
+    <button @click="generate()" :disabled="generating">
       {{ generating ? 'Generating...' : 'Generate Question' }}
+    </button>
+    <input v-model.number="batchCount" type="number" min="2" max="20" class="batch-input" :disabled="generating" />
+    <select v-model="batchDifficulty" class="batch-select" :disabled="generating">
+      <option v-for="d in difficulties" :key="d" :value="d">{{ d }}</option>
+    </select>
+    <button @click="generate(batchCount, batchDifficulty)" :disabled="generating">
+      {{ generating ? 'Generating...' : `Generate ${batchCount}` }}
     </button>
     <button @click="fetchQuestions" :disabled="loading">Refresh</button>
   </div>

@@ -96,6 +96,15 @@ CRITICAL: EXACTLY ONE CORRECT ANSWER
 - Double-check your question logic to ensure distractors cannot also be correct answers
 - Be specific in your question wording to eliminate ambiguity
 
+ANSWER SOURCES: VARY YOUR REFERENCES
+- Do not default to Wikipedia for every question. Use a mix of sources such as:
+  * Official records (CIA World Factbook, UN data, national statistics offices)
+  * Atlases and geographic databases (National Geographic, Britannica)
+  * Domain-specific references (UNESCO World Heritage, USGS, NOAA, IMF, World Bank)
+  * Sports/entertainment references (Olympic records, FIFA, Eurovision, IMDb) when relevant
+  * Academic or specialized publications
+- Each question's answer_sources should reflect where the fact actually comes from, not just Wikipedia
+
 FORMAT:
 Return ONLY JSON, no explanations.
 
