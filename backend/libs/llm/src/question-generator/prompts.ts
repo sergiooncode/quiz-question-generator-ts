@@ -1,4 +1,4 @@
-const QUESTION_GENERATOR_SYSTEM_PROMPT_TEMPLATE = 'Generate quiz questions exactly as requested, matching the target difficulty level. Return ONLY valid JSON, no explanations.';
+const QUESTION_GENERATOR_SYSTEM_PROMPT_TEMPLATE = 'Generate quiz questions exactly as requested, matching the target difficulty level. Return ONLY valid JSON with all required fields including answer_explanation and answer_sources. No text outside the JSON.';
 
 // Prompt template for question generation
 const QUESTION_GENERATOR_USER_PROMPT_TEMPLATE = `
@@ -76,6 +76,16 @@ CRITICAL DISTRACTOR RULES (especially for ADVANCED and EXPERT):
 - For continent-based questions: all options must be on the same continent
 - For regional questions: all options must be in the same region
 - Distractors should be wrong for subtle reasons, not categorical differences
+
+CRITICAL: VARY QUESTION PHRASING
+- Avoid overusing "Among the following...", "Which of the following...", or similar openings. Use them sparingly (at most 1 in 5 questions).
+- Prefer varied formats such as:
+  * Direct questions: "What is the deepest lake in the world?"
+  * Descriptive lead-ins: "This U.S. state is widely known for its whiskey..."
+  * Superlative framing: "The longest river in Africa is..."
+  * Scenario: "If you were standing at the highest point in South America, where would you be?"
+  * Factoid-style: "Home to over 17,000 islands, this country is the largest archipelago in the world."
+  * Simple "Which": "Which European capital sits at the highest elevation?"
 
 CRITICAL: EXACTLY ONE CORRECT ANSWER
 - Only ONE option can be correct. All other options must be definitively wrong.

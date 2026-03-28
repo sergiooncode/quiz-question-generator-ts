@@ -1,4 +1,4 @@
-.PHONY: up up-build down logs logs-app logs-api logs-postgres db-shell quiz db-generate db-migrate db-migrate-deploy db-push db-studio db-seed
+.PHONY: up up-build up-build-no-cache down logs logs-app logs-api logs-frontend logs-postgres db-shell quiz db-generate db-migrate db-migrate-deploy db-push db-studio db-seed
 
 # Start Docker containers (detached)
 up:
@@ -7,6 +7,10 @@ up:
 # Start Docker containers and rebuild images
 up-build:
 	docker compose up -d --build
+
+# Start Docker containers, rebuild with no cache
+up-build-no-cache:
+	docker compose build --no-cache && docker compose up -d
 
 # Stop and remove containers
 down:
@@ -35,7 +39,7 @@ db-shell:
 # Run quiz-generator CLI in Docker (pass command and options via ARGS)
 # Example: make quiz ARGS="generate-question --count 5 --save-to-db --judge"
 quiz:
-	docker compose run --rm app npm start -- $(ARGS)
+	docker compose run --rm app npx tsx backend/apps/cli/src/quiz.ts $(ARGS)
 
 # Prisma commands (Docker) - ensure postgres is running: make up
 db-generate:

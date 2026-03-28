@@ -35,10 +35,31 @@ async function runReview() {
     <div class="meta">
       <span>{{ question.topic }}</span> &middot;
       <span class="badge">{{ question.targetDifficultyLabel }}</span>
-      <template v-if="review">
-        &middot; Score: {{ review.difficultyScore }} ({{ review.difficultyLabel }})
-        &middot; {{ review.isValid ? 'Valid' : 'Invalid' }}
-      </template>
+      &middot; <span>{{ new Date(question.createdAt).toLocaleDateString() }}</span>
+    </div>
+    <div v-if="review" class="review-section">
+      <div class="review-header">
+        <strong>Review</strong>
+        <span :class="['validity-badge', review.isValid ? 'valid' : 'invalid']">
+          {{ review.isValid ? 'Valid' : 'Invalid' }}
+        </span>
+      </div>
+      <div class="review-score">
+        Score: <strong>{{ review.difficultyScore }}</strong> ({{ review.difficultyLabel }})
+      </div>
+      <div class="review-rubric">
+        <span title="Accessibility of Knowledge">AK: {{ review.ak }}</span>
+        <span title="Cognitive Load">CL: {{ review.cl }}</span>
+        <span title="Obscurity of Distractors">OD: {{ review.od }}</span>
+        <span title="Topic Specialization">TS: {{ review.ts }}</span>
+      </div>
+      <div v-if="review.topicMismatch" class="review-warning">Topic mismatch detected</div>
+      <ul v-if="review.styleViolations?.length" class="review-issues">
+        <li v-for="(v, i) in review.styleViolations" :key="i">{{ v }}</li>
+      </ul>
+      <ul v-if="review.factualConcerns?.length" class="review-issues">
+        <li v-for="(c, i) in review.factualConcerns" :key="i">{{ c }}</li>
+      </ul>
     </div>
     <div v-if="question.answerExplanation" class="explanation">
       <strong>Explanation:</strong> {{ question.answerExplanation }}

@@ -68,6 +68,10 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .meta { font-size: 13px; color: var(--muted); margin-top: 8px; }
 
+.explanation { font-size: 13px; margin-top: 10px; color: var(--muted); }
+.sources { font-size: 12px; color: var(--muted); margin-top: 4px; padding-left: 18px; }
+.sources li { padding: 1px 0; }
+
 .toolbar {
   display: flex;
   gap: 8px;
@@ -85,4 +89,51 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border-radius: 12px;
   background: var(--accent);
   color: #fff;
+}
+
+.review-section {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.validity-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 600;
+}
+.validity-badge.valid { background: var(--success); }
+.validity-badge.invalid { background: var(--danger); }
+
+.review-score { color: var(--muted); margin-bottom: 6px; }
+
+.review-rubric {
+  display: flex;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.review-warning {
+  color: var(--danger);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.review-issues {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+  padding-left: 18px;
 }

@@ -5,8 +5,12 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 5173,
+    host: '0.0.0.0',
+    watch: {
+      usePolling: true,
+    },
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': 'http://api:3000',
     },
   },
 })

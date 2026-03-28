@@ -36,9 +36,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: builder
     container_name: quiz-app
+    command: ["npm", "run", "dev"]
     environment:
-      NODE_ENV: production
       DATABASE_URL: postgresql://quiz_user:quiz_password@postgres:5432/quiz_db
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       KAFKA_BROKERS: kafka:9092
@@ -57,10 +58,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: builder
     container_name: quiz-api
-    command: ["node", "dist/backend/apps/api/src/main.js"]
+    command: ["npm", "run", "dev:api"]
     environment:
-      NODE_ENV: production
       DATABASE_URL: postgresql://quiz_user:quiz_password@postgres:5432/quiz_db
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PORT: 3000
@@ -77,11 +78,17 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: builder
     container_name: quiz-frontend
+    command: ["npm", "run", "dev"]
     ports:
-      - "5173:80"
+      - "5173:5173"
     depends_on:
       - api
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.ts:/app/vite.config.ts
 
   # Zookeeper - required for Kafka
   # zookeeper:

@@ -1,8 +1,15 @@
 export interface Review {
   id: number
+  ak: number
+  cl: number
+  od: number
+  ts: number
   difficultyScore: number
   difficultyLabel: string
   isValid: boolean
+  topicMismatch: boolean
+  styleViolations: string[]
+  factualConcerns: string[]
 }
 
 export interface Question {
@@ -15,5 +22,6 @@ export interface Question {
   targetDifficultyLabel: string
   answerExplanation: string | null
   answerSources: string[]
+  createdAt: string
   reviews: Review[]
 }

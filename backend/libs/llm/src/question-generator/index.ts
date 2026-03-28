@@ -54,7 +54,12 @@ export async function generate_question(
   });
 
   // Parse and validate response
+  console.log('[question-generator] Raw LLM response:', content);
   const parsed = JSON.parse(content) as QuestionResponse;
+  console.log('[question-generator] Parsed fields:', {
+    answer_explanation: parsed.answer_explanation,
+    answer_sources: parsed.answer_sources,
+  });
   const validated = QuestionResponseSchema.parse(parsed);
 
   // Add id to the response
