@@ -1,3 +1,4 @@
+import { wrapTraced } from 'braintrust';
 import * as openai from '../clients/openai';
 import { JUDGE_PROMPT_TEMPLATE } from './prompts';
 import {
@@ -13,7 +14,9 @@ import {
  * @param input - Question data to evaluate
  * @returns Judge response with scores and feedback
  */
-export async function judgeQuestion(input: JudgeQuestionInput): Promise<JudgeResponse> {
+export const judgeQuestion = wrapTraced(async function judgeQuestion(
+  input: JudgeQuestionInput
+): Promise<JudgeResponse> {
   // Read provider from environment (future: support multiple providers)
   const provider = process.env.LLM_PROVIDER || 'openai';
   const model = process.env.LLM_JUDGE_MODEL || 'gpt-4.1';
@@ -55,7 +58,7 @@ export async function judgeQuestion(input: JudgeQuestionInput): Promise<JudgeRes
   const validated = JudgeResponseSchema.parse(parsed);
 
   return validated;
-}
+});
 
 // Re-export types
 export * from './types';

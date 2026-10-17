@@ -42,6 +42,8 @@ services:
     environment:
       DATABASE_URL: postgresql://quiz_user:quiz_password@postgres:5432/quiz_db
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      BRAINTRUST_API_KEY: ${BRAINTRUST_API_KEY:-}
+      BRAINTRUST_PROJECT: ${BRAINTRUST_PROJECT:-quiz-question-generator}
       KAFKA_BROKERS: kafka:9092
       PUBSUB_EMULATOR_HOST: pubsub:8085
       PORT: 3002
@@ -64,6 +66,8 @@ services:
     environment:
       DATABASE_URL: postgresql://quiz_user:quiz_password@postgres:5432/quiz_db
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      BRAINTRUST_API_KEY: ${BRAINTRUST_API_KEY:-}
+      BRAINTRUST_PROJECT: ${BRAINTRUST_PROJECT:-quiz-question-generator}
       PORT: 3000
     ports:
       - "3000:3000"

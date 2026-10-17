@@ -9,8 +9,16 @@
         ]
       },
       "chrome-devtools": {
-        "command": "./.mcp-chrome-wrapper.sh",
-        "args": []
+        "command": "npx",
+        "args": ["-y", "chrome-devtools-mcp@latest"]
+      },
+      "playwright": {
+        "command": "npx",
+        "args": ["-y", "@playwright/mcp@latest", "--browser", "chrome"]
+      },
+      "linear": {
+        "type": "http",
+        "url": "https://mcp.linear.app/mcp"
       }
     }
   }

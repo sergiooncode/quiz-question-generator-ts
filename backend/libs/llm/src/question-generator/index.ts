@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { wrapTraced } from 'braintrust';
 import * as openai from '../clients/openai';
 import { QUESTION_GENERATOR_PROMPT_TEMPLATE } from './prompts';
 import { GeneratedQuestion, QuestionResponse, QuestionResponseSchema } from './types';
@@ -11,7 +12,7 @@ import { GeneratedQuestion, QuestionResponse, QuestionResponseSchema } from './t
  * @param recentTopics - Optional array of recently used topics to avoid repetition
  * @returns Generated question with id
  */
-export async function generate_question(
+export const generate_question = wrapTraced(async function generate_question(
   target_difficulty: string = 'INTERMEDIATE',
   recentTopics?: string[]
 ): Promise<GeneratedQuestion> {
@@ -69,7 +70,7 @@ export async function generate_question(
   };
 
   return result;
-}
+});
 
 // Re-export types
 export * from './types';

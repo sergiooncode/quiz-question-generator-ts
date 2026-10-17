@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import Dashboard from './components/Dashboard.vue'
 import QuestionList from './components/QuestionList.vue'
 
 const activeTab = ref('dashboard')
@@ -25,7 +26,7 @@ const tabs = [
       </ul>
     </nav>
     <main class="content">
-      <div v-if="activeTab === 'dashboard'"></div>
+      <Dashboard v-if="activeTab === 'dashboard'" />
       <QuestionList v-if="activeTab === 'generation'" />
     </main>
   </div>

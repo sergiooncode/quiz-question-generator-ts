@@ -4,16 +4,24 @@ import type { Question } from '../types'
 
 const props = defineProps<{ question: Question }>()
 const reviewing = ref(false)
+const reviewError = ref<string | null>(null)
 const review = ref(props.question.reviews?.[0] ?? null)
 
 const labels = ['A', 'B', 'C', 'D']
 
 async function runReview() {
   reviewing.value = true
+  reviewError.value = null
   try {
     const res = await fetch(`/api/questions/${props.question.uuid}/review`, { method: 'POST' })
     const json = await res.json()
+    if (!res.ok) {
+      reviewError.value = json.error ?? `Review failed (${res.status})`
+      return
+    }
     review.value = json.data
+  } catch {
+    reviewError.value = 'Review failed — check your connection and try again.'
   } finally {
     reviewing.value = false
   }
@@ -71,6 +79,7 @@ async function runReview() {
     <ul v-if="question.answerSources?.length" class="sources">
       <li v-for="(source, i) in question.answerSources" :key="i">{{ source }}</li>
     </ul>
+    <div v-if="reviewError" class="review-error">{{ reviewError }}</div>
     <button v-if="!review" @click="runReview" :disabled="reviewing" style="margin-top: 8px">
       {{ reviewing ? 'Reviewing...' : 'Review' }}
     </button>

@@ -17,6 +17,23 @@ enum DifficultyLevel {
   EXPERT
 }
 
+// Outcome of Stage 3 targeted fact verification. Only questions the judge
+// flagged with factual concerns are verified, so most rows are NOT_NEEDED.
+enum FactCheckStatus {
+  NOT_NEEDED
+  PENDING
+  CONFIRMED // concern upheld — the question is factually wrong
+  REFUTED   // concern dismissed — the question is fine
+}
+
+// Where a question stands on the path to the published book.
+enum PublicationStatus {
+  CANDIDATE
+  QUALIFIED
+  REJECTED
+  PUBLISHED
+}
+
 model Question {
   id                      Int             @id @default(autoincrement())
   uuid                    String          @unique @default(uuid())
@@ -36,6 +53,7 @@ model Question {
 
   // Relations
   reviews                 QuestionReview[]
+  qualifications          QuestionQualification[]
 
   @@map("questions")
   @@index([uuid])
@@ -81,4 +99,38 @@ model QuestionReview {
   @@index([questionId])
   @@index([difficultyLabel])
   @@index([isValid])
+}
+
+// Whether a question ships in the book.
+//
+// Deliberately separate from QuestionReview: a review answers "how hard is this
+// and is it sound?", a qualification answers "does it ship?". Book criteria will
+// change, so a question may be re-qualified many times against one review.
+model QuestionQualification {
+  id                      Int               @id @default(autoincrement())
+  uuid                    String            @unique @default(uuid())
+
+  // Relation to Question
+  questionId              Int               @map("question_id")
+  question                Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  // Stage 0 — mechanical gates (no LLM)
+  stage0Passed            Boolean           @map("stage0_passed")
+  stage0Failures          Json              @default("[]") @map("stage0_failures")
+
+  // Stage 3 — targeted fact verification (flagged questions only)
+  factCheckStatus         FactCheckStatus   @default(NOT_NEEDED) @map("fact_check_status")
+
+  // Overall outcome
+  publicationStatus       PublicationStatus @default(CANDIDATE) @map("publication_status")
+  rejectionReasons        Json              @default("[]") @map("rejection_reasons")
+
+  // Timestamps
+  createdAt               DateTime          @default(now()) @map("created_at")
+
+  @@map("question_qualifications")
+  @@index([uuid])
+  @@index([questionId])
+  @@index([publicationStatus])
+  @@index([factCheckStatus])
 }
