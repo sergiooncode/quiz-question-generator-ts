@@ -1,5 +1,5 @@
 /**
- * Stage 0 — mechanical gates.
+ * Mechanical gates (Stage 0 of the qualification funnel).
  *
  * Deterministic pass/fail checks that need no LLM, no network, and no database.
  * Pure functions only: callers decide what to do with the result.
@@ -9,7 +9,7 @@
  * before anything bills an API call.
  */
 
-export type Stage0FailureCode =
+export type MechanicalGateFailureCode =
   | 'empty_question_text'
   | 'missing_explanation'
   | 'missing_sources'
@@ -19,23 +19,23 @@ export type Stage0FailureCode =
   | 'invalid_correct_option'
   | 'correct_option_out_of_range';
 
-export interface Stage0Failure {
-  code: Stage0FailureCode;
+export interface MechanicalGateFailure {
+  code: MechanicalGateFailureCode;
   detail: string;
 }
 
-export interface Stage0Result {
+export interface MechanicalGateResult {
   passed: boolean;
-  failures: Stage0Failure[];
+  failures: MechanicalGateFailure[];
 }
 
 /**
- * The subset of a Question that Stage 0 inspects.
+ * The subset of a Question that the mechanical gates inspect.
  *
  * `options` and `answerSources` are typed as `unknown` because Prisma returns
  * them as `Json` — they are validated here rather than trusted.
  */
-export interface Stage0Input {
+export interface MechanicalGateInput {
   questionText: string;
   options: unknown;
   correctOption: string;
@@ -43,37 +43,27 @@ export interface Stage0Input {
   answerSources: unknown;
 }
 
+import { stripOptionLabel } from './option-label';
+
 /** Options the book requires per question. */
 const REQUIRED_OPTION_COUNT = 4;
 
 const VALID_OPTION_LETTERS = ['a', 'b', 'c', 'd'] as const;
-
-/**
- * Strip an optional leading answer label so comparisons work regardless of
- * whether options are stored as "a) Paris" or bare "Paris".
- *
- * The generator prompt requests the prefixed form, but the frontend renders its
- * own label, so both shapes may exist in the bank. Stage 0 deliberately accepts
- * either — normalizing display format is a separate concern from qualification.
- */
-export function stripOptionLabel(option: string): string {
-  return option.replace(/^\s*[a-dA-D]\s*[).:-]\s*/, '').trim();
-}
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
 /**
- * Run every Stage 0 gate against a question.
+ * Run every mechanical gate against a question.
  *
  * Returns all failures rather than stopping at the first, so a single pass
  * reports everything wrong with a question.
  */
-export function runStage0Gates(question: Stage0Input): Stage0Result {
-  const failures: Stage0Failure[] = [];
+export function runMechanicalGates(question: MechanicalGateInput): MechanicalGateResult {
+  const failures: MechanicalGateFailure[] = [];
 
-  const fail = (code: Stage0FailureCode, detail: string) => {
+  const fail = (code: MechanicalGateFailureCode, detail: string) => {
     failures.push({ code, detail });
   };
 

@@ -18,7 +18,9 @@
     "db:migrate:deploy": "prisma migrate deploy --schema=backend/libs/db/prisma/schema.prisma",
     "db:studio": "prisma studio --schema=backend/libs/db/prisma/schema.prisma",
     "db:seed": "tsx backend/libs/db/prisma/seed.ts",
-    "db:shell": "docker compose exec postgres psql -U quiz_user -d quiz_db"
+    "db:shell": "docker compose exec postgres psql -U quiz_user -d quiz_db",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "quiz",
@@ -35,7 +37,8 @@
     "@types/pg": "^8.16.0",
     "prisma": "^7.2.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.7"
   },
   "dependencies": {
     "@koa/router": "^15.4.0",

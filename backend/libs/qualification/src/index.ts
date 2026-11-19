@@ -1,8 +1,11 @@
-// Stage 0 — mechanical gates
-export { runStage0Gates, stripOptionLabel } from './stage0';
+// Mechanical gates — deterministic structural checks (Stage 0 of the funnel)
+export { runMechanicalGates } from './mechanical-gates';
 export type {
-  Stage0Input,
-  Stage0Result,
-  Stage0Failure,
-  Stage0FailureCode,
-} from './stage0';
+  MechanicalGateInput,
+  MechanicalGateResult,
+  MechanicalGateFailure,
+  MechanicalGateFailureCode,
+} from './mechanical-gates';
+
+// Option label normalization
+export { stripOptionLabel } from './option-label';
