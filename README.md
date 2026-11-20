@@ -34,6 +34,22 @@ npm test              # Vitest; no database or API key needed
 
 Tests mock the LLM and database. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs type-check and tests on every push and pull request.
 
+## Qualification roadmap
+
+Not every generated question belongs in the book. Qualification is a funnel, cheapest stage first; the full design is in [QUALIFICATION.md](QUALIFICATION.md).
+
+**Stage 0: mechanical gates (done, not yet wired in).** `runMechanicalGates` in [backend/libs/qualification](backend/libs/qualification/src/mechanical-gates.ts) is a pure function with no LLM and no database. It checks that a question has text, an explanation and at least one source, exactly four non-empty and distinct options, and a `correct_option` that is a/b/c/d and points to a real option. It reports every failure in one pass and has unit tests. Nothing calls it yet: there is no `qualify` command and no table to store results.
+
+**Coming next:**
+
+| Stage | What it does |
+| ----- | ------------ |
+| 0 (remaining) | Near-duplicate detection across the question bank; the `QuestionQualification` table and a `qualify` CLI command to run the gates over the bank |
+| 1 | Judge review for every question, so none is left unreviewed |
+| 2 | Reject on the judge's free signals: `is_valid`, `topic_mismatch`, and non-empty `factual_concerns` or `style_violations` |
+| 3 | Independent LLM fact-check, only for questions the judge flagged |
+| 4 | Balance the whole set: answer position (~25% each of a/b/c/d), difficulty (250 per band), topic spread, and no repeated facts |
+
 ## Configuration
 
 | Variable | Purpose |
