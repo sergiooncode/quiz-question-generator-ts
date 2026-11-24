@@ -58,3 +58,7 @@ Not every generated question belongs in the book. Qualification is a funnel, che
 | `OPENAI_API_KEY` | Required for generating and judging |
 | `LLM_MODEL` / `LLM_JUDGE_MODEL` | Override the generator (`gpt-4.1-mini`) and judge (`gpt-4.1`) models |
 | `BRAINTRUST_API_KEY` | Optional; enables tracing |
+
+## License
+
+Licensed under the [MIT License](LICENSE).
