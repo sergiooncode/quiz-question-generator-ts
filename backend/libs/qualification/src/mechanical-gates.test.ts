@@ -95,7 +95,9 @@ describe('runMechanicalGates', () => {
     });
 
     it('detects duplicates across labelled and bare forms', () => {
+      // Mixing labelled and bare forms is itself malformed, so both gates fire.
       expect(codes(valid({ options: ['a) Paris', 'Paris', 'c) Nice', 'd) Lille'] }))).toEqual([
+        'malformed_option_prefix',
         'duplicate_options',
       ]);
     });
@@ -108,6 +110,36 @@ describe('runMechanicalGates', () => {
 
     it('does not flag empty options as duplicates of each other', () => {
       expect(codes(valid({ options: ['', '', 'c) y', 'd) z'] }))).toEqual(['empty_option']);
+    });
+  });
+
+  describe('option prefixes', () => {
+    it('accepts correctly ordered labels, in either case', () => {
+      expect(runMechanicalGates(valid({ options: ['A) w', 'b) x', 'C) y', 'd) z'] })).passed).toBe(true);
+    });
+
+    it('accepts bare options that happen to start with a letter and dash', () => {
+      expect(runMechanicalGates(valid({ options: ['D-Day', 'A-levels', 'B-52', 'C-3PO'] })).passed).toBe(true);
+    });
+
+    it('flags a mix of labelled and bare options', () => {
+      const result = runMechanicalGates(valid({ options: ['a) w', 'x', 'c) y', 'd) z'] }));
+      expect(result.failures.map((f) => f.code)).toEqual(['malformed_option_prefix']);
+      expect(result.failures[0].detail).toBe('some options are labelled and some are not');
+    });
+
+    it('flags labels that do not match their position', () => {
+      const result = runMechanicalGates(valid({ options: ['a) w', 'c) x', 'b) y', 'd) z'] }));
+      expect(result.failures.map((f) => f.code)).toEqual(['malformed_option_prefix']);
+      expect(result.failures[0].detail).toBe('option at index 1 is labelled "c)"; option at index 2 is labelled "b)"');
+    });
+
+    it('flags a repeated label', () => {
+      expect(codes(valid({ options: ['a) w', 'a) x', 'c) y', 'd) z'] }))).toEqual(['malformed_option_prefix']);
+    });
+
+    it('does not double-report empty options as unlabelled', () => {
+      expect(codes(valid({ options: ['a) w', '', 'c) y', 'd) z'] }))).toEqual(['empty_option']);
     });
   });
 

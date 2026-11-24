@@ -16,6 +16,7 @@ export type MechanicalGateFailureCode =
   | 'wrong_option_count'
   | 'empty_option'
   | 'duplicate_options'
+  | 'malformed_option_prefix'
   | 'invalid_correct_option'
   | 'correct_option_out_of_range';
 
@@ -49,6 +50,13 @@ import { stripOptionLabel } from './option-label';
 const REQUIRED_OPTION_COUNT = 4;
 
 const VALID_OPTION_LETTERS = ['a', 'b', 'c', 'd'] as const;
+
+/**
+ * The canonical label the generator prompt asks for: "a) ", "b) ", ...
+ * Deliberately strict (needs the closing parenthesis) so a bare option such as
+ * "D-Day" is never mistaken for a label.
+ */
+const OPTION_LABEL_PATTERN = /^\s*([a-dA-D])\)/;
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
@@ -100,6 +108,29 @@ export function runMechanicalGates(question: MechanicalGateInput): MechanicalGat
     .filter((i) => i >= 0);
   if (emptyIndexes.length > 0) {
     fail('empty_option', `Empty option at index ${emptyIndexes.join(', ')}`);
+  }
+
+  // Labels are optional (bare options are accepted), but if any option carries
+  // one they must all carry one, and each must match its position.
+  const labels = options.map((opt) =>
+    isNonEmptyString(opt) ? OPTION_LABEL_PATTERN.exec(opt)?.[1].toLowerCase() ?? null : null
+  );
+  const labelledCount = labels.filter((l) => l !== null).length;
+  const nonEmptyCount = options.filter(isNonEmptyString).length;
+  if (labelledCount > 0) {
+    const problems: string[] = [];
+    // Empty options are already reported as empty_option; don't count them as unlabelled.
+    if (labelledCount < nonEmptyCount) {
+      problems.push('some options are labelled and some are not');
+    }
+    labels.forEach((label, i) => {
+      if (label !== null && label !== VALID_OPTION_LETTERS[i]) {
+        problems.push(`option at index ${i} is labelled "${label})"`);
+      }
+    });
+    if (problems.length > 0) {
+      fail('malformed_option_prefix', problems.join('; '));
+    }
   }
 
   // Compare on stripped, case-folded text so "a) Paris" and "Paris" collide.

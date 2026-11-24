@@ -38,7 +38,7 @@ Tests mock the LLM and database. CI ([.github/workflows/ci.yml](.github/workflow
 
 Not every generated question belongs in the book. Qualification is a funnel, cheapest stage first; the full design is in [QUALIFICATION.md](QUALIFICATION.md).
 
-**Stage 0: mechanical gates (done, not yet wired in).** `runMechanicalGates` in [backend/libs/qualification](backend/libs/qualification/src/mechanical-gates.ts) is a pure function with no LLM and no database. It checks that a question has text, an explanation and at least one source, exactly four non-empty and distinct options, and a `correct_option` that is a/b/c/d and points to a real option. It reports every failure in one pass and has unit tests. Nothing calls it yet: there is no `qualify` command and no table to store results.
+**Stage 0: mechanical gates (done, not yet wired in).** `runMechanicalGates` in [backend/libs/qualification](backend/libs/qualification/src/mechanical-gates.ts) is a pure function with no LLM and no database. It checks that a question has text, an explanation and at least one source, exactly four non-empty and distinct options, consistent `a)`/`b)`/`c)`/`d)` labels if any are used, and a `correct_option` that is a/b/c/d and points to a real option. It reports every failure in one pass and has unit tests. Nothing calls it yet: there is no `qualify` command and no table to store results.
 
 **Coming next:**
 
